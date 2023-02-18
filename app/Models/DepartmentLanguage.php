@@ -15,6 +15,13 @@ class DepartmentLanguage extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'department_id',
+        'language_id',
+        'name',
+    ];
+
     public function department()
     {
         return $this->belongsTo(Department::class, 'department_id', 'id');

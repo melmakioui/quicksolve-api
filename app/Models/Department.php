@@ -15,6 +15,10 @@ class Department extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'type'
+    ];
     public function incidences()
     {
         return $this->hasMany(Incidence::class, 'department_id', 'id');
@@ -23,6 +27,11 @@ class Department extends Model
     public function users()
     {
         return $this->hasMany(User::class, 'department_id', 'id');
+    }
+
+    public function departmentLangs()
+    {
+        return $this->hasMany(DepartmentLanguage::class, 'department_id', 'id');
     }
 
 }
