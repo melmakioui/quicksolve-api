@@ -13,6 +13,13 @@ class SpaceLanguage extends Model
     public $timestamps = false;
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'space_id',
+        'language_id',
+        'name',
+    ];
+     
     public function space()
     {
         return $this->belongsTo(Space::class, 'space_id', 'id');

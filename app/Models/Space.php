@@ -13,8 +13,17 @@ class Space extends Model
     public $timestamps = false;
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+    ];
+    
     public function incidences()
     {
         return $this->hasMany(Incidence::class, 'space_id', 'id');
+    }
+
+    public function spaceLangs()
+    {
+        return $this->hasMany(SpaceLanguage::class, 'space_id', 'id');
     }
 }
