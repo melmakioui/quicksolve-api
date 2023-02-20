@@ -17,7 +17,7 @@ class IncidenceState extends Model
 
     public function incidenceStateLangs()
     {
-        return $this->hasMany(IncidenceStateLang::class, 'incidence_state_id', 'id');
+        return $this->hasMany(IncidenceStateLanguage::class, 'incidence_state_id', 'id');
     }
 
     public function incidences()

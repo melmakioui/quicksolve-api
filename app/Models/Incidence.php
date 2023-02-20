@@ -12,6 +12,18 @@ class Incidence extends Model
     public $timestamps = false;
 
     protected $primaryKey = 'id';
+
+    protected $fillable = [
+        'id',
+        'space_id',
+        'department_id',
+        'incidence_state_id',
+        'title',
+        'email',
+        'description',
+        'date_start',
+        'date_end',
+    ];
     
     
     public function space()
@@ -32,6 +44,11 @@ class Incidence extends Model
     public function incidenceFiles()
     {
         return $this->hasMany(IncidenceFile::class, 'incidence_id', 'id');
+    }
+
+    public function userIncidences()
+    {
+        return $this->hasMany(UserIncidence::class, 'incidence_id', 'id');
     }
 
 
