@@ -15,8 +15,7 @@ class SpaceController extends Controller
 
     public function index()
     {
-        $spaces = Space::all()->load('spaceLangs');
-        return response()->json(SpaceResource::collection($spaces));
+        return response()->json(SpaceResource::collection(Space::all()));
     }
 
     public function show($id)

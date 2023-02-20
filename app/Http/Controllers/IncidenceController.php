@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\IncidenceResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -17,8 +18,7 @@ class IncidenceController extends Controller
     private const  INCIDENCE_TYPE_CANCEL = 4;
     public function index()
     {
-        $incidences = Incidence::all()->load('userIncidences.user');
-        return response()->json(IncidenceResource::collection($incidences),200);
+        return response()->json(IncidenceResource::collection(Incidence::all()),200);
     }
 
     public function showIncidencesByState(Request $request)
@@ -41,17 +41,10 @@ class IncidenceController extends Controller
     }
 
 
-    public function show(Request $request)
+    public function show($id)
     {
-        $validator = Validator::make($request->all(), [
-            'id' => 'required|integer',
-        ],);
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
-        }
-
-        $incidence = Incidence::find($request->id)->load('userIncidences.user');
+        $incidence = Incidence::find($id);
 
         if (!$incidence) {
             return response()->json(['message' => 'Incidence not found'], 404);
@@ -127,10 +120,10 @@ class IncidenceController extends Controller
 
         $incidence->save();
 
-        $incidenceUpdated = Incidence::find($request->id)->load('userIncidences.user');
+        $incidenceUpdated = Incidence::find($request->id);
 
         return response()->json(['message' => 'Incidence state changed', 
-        'Incidence Updated' => IncidenceResource::make($incidenceUpdated)], 200);
+        'IncidenceUpdated' => IncidenceResource::make($incidenceUpdated)], 200);
     }
 
 
@@ -153,17 +146,21 @@ class IncidenceController extends Controller
             return response()->json(['message' => 'User incidence not found'], 404);
         }
 
-        if( $userIncidence->load('user')->user->type != "TECH" ){
-            return response()->json(['message' => 'User is not a technician'], 404);
+        $tech = User::find($request->techId);
+
+
+        if (!$tech || $tech->type !== 'TECH') {
+            return response()->json(['message' => 'Tech not found'], 404);
         }
 
         $userIncidence->tech_id = $request->techId;
-        $userIncidence->save();
+        $userIncidence->update(["tech_id" => $request->techId]);
+     
 
-        $incidenceUpdated = Incidence::find($request->id)->load('userIncidences.user');
+        $incidenceUpdated = Incidence::find($request->id);
 
         return response()->json(['message' => 'Incidence tech changed', 
-        'Incidence Updated' =>  IncidenceResource::make($incidenceUpdated),200]);
+        'IncidenceUpdated' =>  IncidenceResource::make($incidenceUpdated),200]);
     }
 
 }

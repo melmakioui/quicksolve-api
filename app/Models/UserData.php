@@ -20,7 +20,6 @@ class UserData extends Model
         'name',
         'first_surname',
         'second_surname',
-        'user_id',
         'created'
     ];
 

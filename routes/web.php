@@ -5,6 +5,7 @@ use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,7 +42,7 @@ Route::controller(DepartmentController::class)->group(function () {
 Route::controller(IncidenceController::class)->group(function () {
 
     Route::get('/incidences', 'index');
-    Route::get('/incidence', 'show');
+    Route::get('/incidence/{id}', 'show');
     Route::put('/incidence/update', 'update'); 
     Route::post('/incidences/state', 'showIncidencesByState');
     Route::post('/incidence/state/change', 'changeState');
@@ -58,4 +59,15 @@ Route::controller(UserController::class)->group(function () {
     Route::post('/user/save', 'store');
     Route::put('/user/update', 'update');
     Route::post('/user/lock', 'lockUser');
+    Route::post('/users/department', 'showUsersByDepartment');
+    Route::post('/users/type', 'showUsersByType');
+});
+
+
+Route::controller(ServiceController::class)->group(function () {
+    Route::get('/services', 'index');
+    Route::get('/service/{id}', 'show');
+    Route::post('/service/save', 'store');
+    Route::put('/service/update', 'update');
+    Route::delete('/service/delete', 'destroy');
 });

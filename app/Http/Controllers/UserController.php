@@ -15,13 +15,12 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::all()->load('userData');
-        return response()->json(UserResource::collection($users),200);
+        return response()->json(UserResource::collection(User::all()),200);
     }
 
     public function show(Request $request)
     {
-        $user = User::find($request->id)->load('department','service','userData');
+        $user = User::find($request->id);
         return response()->json(new UserResource($user),200);
     }
 
@@ -71,6 +70,46 @@ class UserController extends Controller
         $user->is_active = $request->isActive;
         $user->save();
         return response()->json(new UserResource($user),200);
+    }
+
+    public function showUsersByType(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'type' => 'required|string',
+        ],);
+
+        if ($validator->fails() || ($request->type != 'USER' && $request->type != 'TECH')) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $users = User::where('type',$request->type)->get()->load('department','service','userData');
+
+        if (!$users) {
+            return response()->json(['message' => 'Users not found'], 404);
+        }
+
+        return response()->json(UserResource::collection($users),200);
+    }
+
+
+
+    public function showUsersByDepartment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'departmentId' => 'required|integer',
+        ],);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $users = User::where('department_id',$request->department)->get()->load('department','service','userData');
+
+        if (!$users) {
+            return response()->json(['message' => 'Users not found'], 404);
+        }
+
+        return response()->json(UserResource::collection($users),200);
     }
 
 }
