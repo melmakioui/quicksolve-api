@@ -19,7 +19,6 @@ use App\Http\Controllers\ServiceController;
 */
 
 Route::controller(SpaceController::class)->group(function () {
-   
     Route ::get('/spaces', 'index');
     Route::get('/space/{id}', 'show');
     Route::post('/space/save', 'store');
@@ -30,7 +29,6 @@ Route::controller(SpaceController::class)->group(function () {
 
 Route::controller(DepartmentController::class)->group(function () {
     Route::get('/departments', 'index');
-
     Route::get('/department/{id}', 'show');
     Route::post('/department/save', 'store');
     Route::put('/department/update', 'update');
@@ -40,7 +38,6 @@ Route::controller(DepartmentController::class)->group(function () {
 });
 
 Route::controller(IncidenceController::class)->group(function () {
-
     Route::get('/incidences', 'index');
     Route::get('/incidence/{id}', 'show');
     Route::put('/incidence/update', 'update'); 
@@ -50,10 +47,7 @@ Route::controller(IncidenceController::class)->group(function () {
 });
 
 
-//Users
-
 Route::controller(UserController::class)->group(function () {
-
     Route::get('/users','index');
     Route::get('/user/{id}', 'show');
     Route::post('/user/save', 'store');

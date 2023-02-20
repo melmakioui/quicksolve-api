@@ -16,7 +16,7 @@ class AdvantageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'names' => $this->advantageLangs->map(function ($advantageLang) {
+            'name' => $this->advantageLangs->map(function ($advantageLang) {
                 return [
                     'language' => $advantageLang->language->name,
                     'name' => $advantageLang->name,
