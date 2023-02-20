@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SpaceController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\IncidenceController;
-use App\Http\Resources\IncidenceResource;
-use App\Models\Incidence;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,58 +17,45 @@ use App\Models\Incidence;
 |
 */
 
-//Spaces
 Route::controller(SpaceController::class)->group(function () {
-
-    Route::get('/spaces', 'index');
-
+   
+    Route ::get('/spaces', 'index');
     Route::get('/space/{id}', 'show');
-
     Route::post('/space/save', 'store');
-
     Route::put('/space/update', 'update');
-
     Route::delete('/space/delete', 'destroy');
 });
 
-//Departments
 
 Route::controller(DepartmentController::class)->group(function () {
-
     Route::get('/departments', 'index');
 
     Route::get('/department/{id}', 'show');
-
     Route::post('/department/save', 'store');
-
     Route::put('/department/update', 'update');
-
     Route::delete('/department/delete', 'destroy');
-
     Route::post('/department/type', 'getByDepartmentByType');
-
     Route::put('/department/update/type', 'updateDepartmentType');
 });
 
-
-//Incidences
-
 Route::controller(IncidenceController::class)->group(function () {
 
-    Route::get('/incidences', function(){
-        return IncidenceResource::collection(Incidence::all()->load('userIncidences.user'));
-    });
-
-    Route::get('/incidence/{id}', 'show');
-
-    // Route::post('/department/save', 'store');
-
-    // Route::put('/department/update', 'update');
-
-    Route::delete('/incidence/close', 'destroy');
-
-    // Route::post('/department/type', 'getByDepartmentByType');
-
-    // Route::put('/department/update/type', 'updateDepartmentType');
+    Route::get('/incidences', 'index');
+    Route::get('/incidence', 'show');
+    Route::put('/incidence/update', 'update'); 
+    Route::post('/incidences/state', 'showIncidencesByState');
+    Route::post('/incidence/state/change', 'changeState');
+    Route::post('/incidence/change/tech', 'changeTech');
 });
 
+
+//Users
+
+Route::controller(UserController::class)->group(function () {
+
+    Route::get('/users','index');
+    Route::get('/user/{id}', 'show');
+    Route::post('/user/save', 'store');
+    Route::put('/user/update', 'update');
+    Route::post('/user/lock', 'lockUser');
+});

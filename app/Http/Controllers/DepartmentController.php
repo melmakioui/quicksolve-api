@@ -14,7 +14,7 @@ class DepartmentController extends Controller
 {
     public function index()
     {
-         $departments = DepartmentResource::collection(Department::all()->load('departmentLangs'));       
+        $departments = DepartmentResource::collection(Department::all()->load('departmentLangs'));
         return response()->json($departments, 200);
     }
 
