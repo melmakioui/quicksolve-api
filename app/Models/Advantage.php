@@ -22,6 +22,6 @@ class Advantage extends Model
 
     public function advantageLangs()
     {
-        return $this->hasMany(AdvantageLang::class, 'advantage_id', 'id');
+        return $this->hasMany(AdvantageLanguage::class, 'advantage_id', 'id');
     }
 }
