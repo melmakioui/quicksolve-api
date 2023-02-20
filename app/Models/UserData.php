@@ -21,6 +21,7 @@ class UserData extends Model
         'first_surname',
         'second_surname',
         'user_id',
+        'created'
     ];
 
     public function user()

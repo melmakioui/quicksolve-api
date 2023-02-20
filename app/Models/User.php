@@ -17,6 +17,8 @@ class User extends Model
 
     protected $fillable = [
         'id',
+        'username',
+        'is_active',
         'email',
         'service_expiration',
         'type',
@@ -41,5 +43,10 @@ class User extends Model
 
     public function userData(){
         return $this->hasOne(UserData::class, 'user_id', 'id');
+    }
+
+    public function userIncidences()
+    {
+        return $this->hasMany(UserIncidence::class, 'user_id', 'id');
     }
 }
