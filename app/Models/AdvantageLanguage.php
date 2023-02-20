@@ -15,6 +15,13 @@ class AdvantageLanguage extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'advantage_id',
+        'language_id',
+        'name',
+    ];
+
     public function advantage()
     {
         return $this->belongsTo(Advantage::class, 'advantage_id', 'id');

@@ -21,7 +21,9 @@ class ServiceResource extends JsonResource
         'name' => $this->name,
         'price' => $this->price,
         'tax' => $this->tax,
-        'advantages' => AdvantageResource::collection($this->advantages),
+        'advantages' => $this->advantages->map(function ($advantage) {
+            return AdvantageResource::make($advantage);
+        }),
     ];
     }
 }

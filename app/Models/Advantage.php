@@ -15,6 +15,11 @@ class Advantage extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'service_id',
+    ];
+
     public function service()
     {
         return $this->belongsTo(Service::class, 'service_id', 'id');

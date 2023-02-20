@@ -16,7 +16,14 @@ class AdvantageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->advantageLangs->where('language_id', 1)->first()->name,
+            'names' => $this->advantageLangs->map(function ($advantageLang) {
+                return [
+                    'language' => $advantageLang->language->name,
+                    'name' => $advantageLang->name,
+                ];
+            }),
         ];
     }
+
+
 }
