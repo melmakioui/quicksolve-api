@@ -19,7 +19,7 @@ use App\Http\Controllers\ServiceController;
 */
 
 Route::controller(SpaceController::class)->group(function () {
-    Route ::get('/spaces', 'index');
+    Route::get('/spaces', 'index');
     Route::get('/space/{id}', 'show');
     Route::post('/space/save', 'store');
     Route::put('/space/update', 'update');

@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use App\Http\Middleware\Cors;
 
@@ -38,6 +39,7 @@ class Kernel extends HttpKernel
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            AuthController::class
         ],
 
         'api' => [
