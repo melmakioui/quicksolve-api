@@ -17,7 +17,11 @@ class SpaceResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->spaceLangs->where('language_id', 1)->first()->name,
-            'traduction' => $this->spaceLangs->where('language_id', 2)->first()->name,
+            'traductions' => $this->spaceLangs->map(function($item, $key){
+                return [
+                    $item->language->name => $item->name,
+                ];
+            }),
         ];
     }
 }
