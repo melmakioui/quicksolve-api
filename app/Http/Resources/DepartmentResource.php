@@ -19,7 +19,11 @@ class DepartmentResource extends JsonResource
             'id' => $this->id,
             'type' => $this->type,
             'name' => $this->departmentLangs->where('language_id', 1)->first()->name,
-            'traduction' => $this->departmentLangs->where('language_id', 2)->first()->name,
+            'traductions' => $this->departmentLangs->map(function($item, $key){
+                return [
+                    $item->language->name => $item->name,
+                ];
+            }),
         ];
     }
 }

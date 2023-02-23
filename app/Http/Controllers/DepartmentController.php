@@ -35,11 +35,16 @@ class DepartmentController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
-            'traduction' => 'required|string',
+            'type' => 'required|string',
+            'languages' => 'required|array',
         ],);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
+        }
+
+        if (DepartmentLanguage::where('name', $request->name)->get()->first()) {
+            return response()->json(['message' => 'Department already exists', 'success' => false], 400);
         }
 
         DB::beginTransaction();
@@ -48,26 +53,28 @@ class DepartmentController extends Controller
         $department->type = $request->type;
         $department->save();
 
-        $departmentLanguageEs = DepartmentLanguage::create([
+        $departmentLanguage = DepartmentLanguage::create([
             'department_id' => $department->id,
             'language_id' => Language::where('name', 'es')->get()->first()->id,
             'name' => $request->name,
         ])->save();
 
-        $departmentLanguageEn = DepartmentLanguage::create([
-            'department_id' => $department->id,
-            'language_id' => Language::where('name', 'en')->get()->first()->id,
-            'name' => $request->traduction,
-        ])->save();
+        foreach($request->languages as $key => $value){
+            if(!Language::where('name', $key)->get()->first()) continue;
+            $departmentLanguage = DepartmentLanguage::create([
+                'department_id' => $department->id,
+                'language_id' => Language::where('name', $key)->get()->first()->id,
+                'name' => $value,
+            ])->save();
+        }
 
-
-        if (!$departmentLanguageEs || !$departmentLanguageEn) {
+        if (!$departmentLanguage) {
             DB::rollBack();
-            return response()->json(['message' => 'Error creating department'], 500);
+            return response()->json(['message' => 'Error creating department', 'success' => false], 500);
         }
 
         DB::commit();
-        return response()->json([$departmentLanguageEs, $departmentLanguageEn], 200);
+        return response()->json(['message' => 'Added succesfully', 'success' => true], 200);
     }
 
 
@@ -77,7 +84,7 @@ class DepartmentController extends Controller
             'id' => 'required|integer',
             'type' => 'required|string',
             'name' => 'required|string',
-            'traduction' => 'required|string',
+            'languages' => 'required','array',
         ]);
 
         if ($validator->fails()) {
@@ -87,29 +94,37 @@ class DepartmentController extends Controller
         DB::beginTransaction();
 
         $department = Department::find($request->id);
-        $department->type = $request->type;
-        $department->save();
 
+        if (!$department) {
+            return response()->json(['message' => 'Department not found'], 404);
+        } else{
+            $department->type = $request->type;
+            $department->save();
+        }
+        
         $departmentLanguageEs = DepartmentLanguage::where('department_id', $request->id)
             ->where('language_id', Language::where('name', 'es')->get()->first()->id)
             ->get()->first();
         $departmentLanguageEs->name = $request->name;
         $departmentLanguageEs->save();
 
-        $departmentLanguageEn = DepartmentLanguage::where('department_id', $request->id)
-            ->where('language_id', Language::where('name', 'en')->get()->first()->id)
-            ->get()->first();
-        $departmentLanguageEn->name = $request->traduction;
-        $departmentLanguageEn->save();
+            foreach ($request->languages as $key => $value) {    
+                if(!Language::where('name', $key)->get()->first()) continue;
+                
+                $departmentLanguage = DepartmentLanguage::where('department_id', $request->id)
+                    ->where('language_id', Language::where('name', $key)->get()->first()->id)
+                    ->get()->first();
+                if(!$departmentLanguage) continue;
+                $departmentLanguage->name = $value;
+                $departmentLanguage->save();
+            }
 
-
-        if (!$departmentLanguageEn || !$departmentLanguageEn) {
+        if (!$departmentLanguageEs) {
             DB::rollBack();
             return response()->json(['message' => 'Error updating department'], 500);
         }
 
         DB::commit();
-
         return response()->json(['message' => 'Department updated'], 200);
     }
 
@@ -137,12 +152,11 @@ class DepartmentController extends Controller
 
         if (!$department) {
             DB::rollBack();
-            return response()->json(['message' => 'Error deleting department'], 500);
+            return response()->json(['message' => 'Error deleting department', 'success' => false], 500);
         }
 
         DB::commit();
-
-        return response()->json(['message' => 'Department deleted'], 200);
+        return response()->json(['message' => 'Department deleted', 'success' => true], 200);
     }
 
     public function getByDepartmentByType(Request $request)
@@ -158,7 +172,7 @@ class DepartmentController extends Controller
         $departments = Department::where('type', $request->type)->get()->load('departmentLangs');
 
         if (!$departments) {
-            return response()->json(['message' => 'Departments not found'], 404);
+            return response()->json(['message' => 'Departments with type' . $request->type .'not found'], 404);
         }
 
         return response()->json(DepartmentResource::collection($departments), 200);
@@ -180,9 +194,9 @@ class DepartmentController extends Controller
         $department->save();
 
         if (!$department) {
-            return response()->json(['message' => 'Error updating department type'], 500);
+            return response()->json(['message' => 'Error updating department type', 'success' => false], 500);
         }
 
-        return response()->json(['message' => 'Department type updated'], 200);
+        return response()->json(['message' => 'Department type updated', 'success' => true], 200);
     }
 }
