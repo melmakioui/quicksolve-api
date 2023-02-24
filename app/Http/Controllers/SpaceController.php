@@ -64,7 +64,7 @@ class SpaceController extends Controller
             ])->save();
         }
 
-
+        
         if (!$spaceLanguage) {
             DB::rollBack();
             return response()->json(['message' => 'Error creating space', 'success' => false], 500);
