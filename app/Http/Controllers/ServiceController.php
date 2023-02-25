@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Language;
 use App\Models\Service;
 use App\Http\Resources\ServiceResource;
 use App\Models\Advantage;
@@ -36,15 +37,14 @@ class ServiceController extends Controller
             'price' => 'required|numeric',
             'tax' => 'required|numeric',
             'advantageOne' => 'required|string',
-            'advantageTraductionOne' => 'required|string',
+            'advantageOneLangs' => 'required|array',
             'advantageTwo' => 'required|string',
-            'advantageTraductionTwo' => 'required|string',
+            'advantageTwoLangs' => 'required|array',
         ],);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
-
 
         DB::beginTransaction();
 
@@ -58,38 +58,26 @@ class ServiceController extends Controller
         $advantageOne->service_id = $service->id;
         $advantageOne->save();
 
-        $advantageOneNames = [
-            'advantage' => $request->advantageOne,
-            'traduction' => $request->advantageTraductionOne
-        ];
-
-        $lang = 1;
-
-        foreach ($advantageOneNames as $key => $value) {
-            $advantageLanguage = new AdvantageLanguage();
-            $advantageLanguage->advantage_id = $advantageOne->id;
-            $advantageLanguage->name = $advantageOneNames[$key];
-            $advantageLanguage->language_id = $lang++;
-            $advantageLanguage->save();
-        }
-
         $advantageTwo = new Advantage();
         $advantageTwo->service_id = $service->id;
         $advantageTwo->save();
 
-        $advantageTwoNames = [
-            'advantage' => $request->advantageTwo,
-            'traduction' => $request->advantageTraductionTwo
-        ];
+        foreach($request->advantageOneLangs as $key => $value) {
+            if (!Language::where('name', $key)->get()->first()) continue;
+            $advantageOneLang = new AdvantageLanguage();
+            $advantageOneLang->advantage_id = $advantageOne->id;
+            $advantageOneLang->language_id = Language::where('name', $key)->get()->first()->id;
+            $advantageOneLang->name = $value;
+            $advantageOneLang->save();
+        }
 
-        $lang = 1;
-
-        foreach ($advantageOneNames as $key => $value) {
-            $advantageLanguage = new AdvantageLanguage();
-            $advantageLanguage->advantage_id = $advantageTwo->id;
-            $advantageLanguage->name = $advantageTwoNames[$key];
-            $advantageLanguage->language_id = $lang++;;
-            $advantageLanguage->save();
+        foreach($request->advantageTwoLangs as $key => $value) {
+            if (!Language::where('name', $key)->get()->first()) continue;
+            $advantageTwoLang = new AdvantageLanguage();
+            $advantageTwoLang->advantage_id = $advantageTwo->id;
+            $advantageTwoLang->language_id = Language::where('name', $key)->get()->first()->id;
+            $advantageTwoLang->name = $value;
+            $advantageTwoLang->save();
         }
 
         if (!$service) {
@@ -111,9 +99,9 @@ class ServiceController extends Controller
             'price' => 'required|numeric',
             'tax' => 'required|numeric',
             'advantageOne' => 'required|string',
-            'advantageTraductionOne' => 'required|string',
             'advantageTwo' => 'required|string',
-            'advantageTraductionTwo' => 'required|string',
+            'advantageOneLangs' => 'required|array',
+            'advantageTwoLangs' => 'required|array',
         ],);
 
 
@@ -137,34 +125,33 @@ class ServiceController extends Controller
         $advantageOne = Advantage::where('service_id', $service->id)->get()->first();
         $advantageTwo = Advantage::where('service_id', $service->id)->get()->last();
 
-        $advantageOneNames = [
-            'advantage' => $request->advantageOne,
-            'traduction' => $request->advantageTraductionOne
-        ];
-
-        $advantageTwoNames = [
-            'advantage' => $request->advantageTwo,
-            'traduction' => $request->advantageTraductionTwo
-        ];
-
-        $lang = 1;
-
-        foreach ($advantageOneNames as $key => $value) {
-            $advantageLanguage = AdvantageLanguage::where('advantage_id', $advantageOne->id)
-                ->where('language_id', $lang)->get()->first();
-            $advantageLanguage->name = $advantageOneNames[$key];
-            $advantageLanguage->save();
-            $lang++;
+        if (!$advantageOne || !$advantageTwo) {
+            DB::rollBack();
+            return response()->json(['message' => 'Advantage not found'], 404);
         }
 
-        $lang = 1;
+        foreach($request->advantageOneLangs as $key => $value) {
+            if (!Language::where('name', $key)->get()->first()) continue;
+            $advantageOneLang = AdvantageLanguage::where('advantage_id', $advantageOne->id)->where('language_id', Language::where('name', $key)->get()->first()->id)->get()->first();
+            if (!$advantageOneLang) {
+                $advantageOneLang = new AdvantageLanguage();
+                $advantageOneLang->advantage_id = $advantageOne->id;
+                $advantageOneLang->language_id = Language::where('name', $key)->get()->first()->id;
+            }
+            $advantageOneLang->name = $value;
+            $advantageOneLang->save();
+        }
 
-        foreach ($advantageTwoNames as $key => $value) {
-            $advantageLanguage = AdvantageLanguage::where('advantage_id', $advantageTwo->id)
-                ->where('language_id', $lang)->get()->first();
-            $advantageLanguage->name = $advantageTwoNames[$key];
-            $advantageLanguage->save();
-            $lang++;
+        foreach($request->advantageTwoLangs as $key => $value) {
+            if (!Language::where('name', $key)->get()->first()) continue;
+            $advantageTwoLang = AdvantageLanguage::where('advantage_id', $advantageTwo->id)->where('language_id', Language::where('name', $key)->get()->first()->id)->get()->first();
+            if (!$advantageTwoLang) {
+                $advantageTwoLang = new AdvantageLanguage();
+                $advantageTwoLang->advantage_id = $advantageTwo->id;
+                $advantageTwoLang->language_id = Language::where('name', $key)->get()->first()->id;
+            }
+            $advantageTwoLang->name = $value;
+            $advantageTwoLang->save();
         }
 
         if (!$service) {

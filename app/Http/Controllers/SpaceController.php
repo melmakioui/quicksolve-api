@@ -36,7 +36,7 @@ class SpaceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
-            'traduction' => 'required|string',
+            'languages' => 'required|array',
         ],);
 
         if ($validator->fails()) {
@@ -48,25 +48,30 @@ class SpaceController extends Controller
         $space = new Space();
         $space->save();
 
-        $spaceLanguageEs = SpaceLanguage::create([
+        $spaceLanguage = SpaceLanguage::create([
             'space_id' => $space->id,
             'language_id' => Language::where('name', 'es')->get()->first()->id,
             'name' => $request->name,
         ])->save();
 
-        $spaceLanguageEn = SpaceLanguage::create([
-            'space_id' => $space->id,
-            'language_id' => Language::where('name', 'en')->get()->first()->id,
-            'name' => $request->traduction,
-        ])->save();
 
-        if (!$spaceLanguageEs || !$spaceLanguageEn) {
+        foreach ($request->languages as $key => $value) {
+            if (!Language::where('name', $key)->get()->first()) continue;
+            $spaceLanguage = SpaceLanguage::create([
+                'space_id' => $space->id,
+                'language_id' => Language::where('name', $key)->get()->first()->id,
+                'name' => $value,
+            ])->save();
+        }
+
+        
+        if (!$spaceLanguage) {
             DB::rollBack();
-            return response()->json(['message' => 'Error creating space'], 500);
+            return response()->json(['message' => 'Error creating space', 'success' => false], 500);
         }
 
         DB::commit();
-        return response()->json([$spaceLanguageEs, $spaceLanguageEn], 200);
+        return response()->json([$spaceLanguage], 200);
     }
 
 
@@ -75,7 +80,7 @@ class SpaceController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required|integer',
             'name' => 'required|string',
-            'traduction' => 'required|string',
+            'languages' => 'required|array',
         ]);
 
         if ($validator->fails()) {
@@ -84,26 +89,33 @@ class SpaceController extends Controller
 
         DB::beginTransaction();
 
+        $space = Space::find($request->id);
+
+        if (!$space) {
+            return response()->json(['message' => 'Space not found'], 404);
+        }
+
         $spaceLanguageEs = SpaceLanguage::where('space_id', $request->id)
             ->where('language_id', Language::where('name', 'es')->get()->first()->id)
             ->get()->first();
-
-        $spaceLanguageEn = SpaceLanguage::where('space_id', $request->id)
-            ->where('language_id', Language::where('name', 'en')->get()->first()->id)
-            ->get()->first();
-
         $spaceLanguageEs->name = $request->name;
-        $spaceLanguageEn->name = $request->traduction;
         $spaceLanguageEs->save();
-        $spaceLanguageEn->save();
 
-        if (!$spaceLanguageEs || !$spaceLanguageEn) {
+        foreach($request->languages as $key => $value){
+            if(!Language::where('name', $key)->get()->first()) continue;
+            $spaceLanguage = SpaceLanguage::where('space_id', $request->id)
+                ->where('language_id', Language::where('name', $key)->get()->first()->id)
+                ->get()->first();
+            $spaceLanguage->name = $value;
+            $spaceLanguage->save();
+        }
+
+        if (!$space) {
             DB::rollBack();
             return response()->json(['message' => 'Error updating space'], 500);
         }
 
         DB::commit();
-
         return response()->json(['message' => 'Space updated'], 200);
     }
 
