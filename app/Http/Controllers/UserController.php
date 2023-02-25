@@ -35,7 +35,6 @@ class UserController extends Controller
             'isActive' => 'required|boolean',
             'name' => 'required|string',
             'firstSurname' => 'required|string',
-            'department' => 'required|integer',
         ],);
 
         if ($validator->fails()) {
@@ -48,7 +47,7 @@ class UserController extends Controller
                 'email' => $request->email,
                 'type' => $request->type,
                 'is_active' => $request->isActive,
-                'department_id' => $request->department,
+                'department_id' => $request->department ? $request->department : null,
             ]);
 
         UserData::where('user_id',$request->id)
