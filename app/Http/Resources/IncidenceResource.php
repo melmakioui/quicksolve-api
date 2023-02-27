@@ -29,6 +29,7 @@ class IncidenceResource extends JsonResource
             'tech' => $tech ? new UserResource($tech) : '',
             'date_start' => $this->date_start ? date('d/m/Y', strtotime($this->date_start)) : '',
             'date_end' => $this->date_end ? date('d/m/Y', strtotime($this->date_end)) : '',
+            'date_period' => $this->date_period ? $this->date_period : null,
         ];
 
 

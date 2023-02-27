@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Incidence;
 use App\Models\UserIncidence;
+use Carbon\Carbon;
 
 class IncidenceController extends Controller
 {
@@ -18,7 +19,7 @@ class IncidenceController extends Controller
     private const  INCIDENCE_TYPE_CANCEL = 4;
     public function index()
     {
-        return response()->json(IncidenceResource::collection(Incidence::all()),200);
+        return response()->json(IncidenceResource::collection(Incidence::all()), 200);
     }
 
     public function showIncidencesByState(Request $request)
@@ -37,7 +38,7 @@ class IncidenceController extends Controller
             return response()->json(['message' => 'Incidences not found'], 404);
         }
 
-        return response()->json(IncidenceResource::collection($incidences),200);
+        return response()->json(IncidenceResource::collection($incidences), 200);
     }
 
 
@@ -49,8 +50,8 @@ class IncidenceController extends Controller
         if (!$incidence) {
             return response()->json(['message' => 'Incidence not found'], 404);
         }
-        
-        return response()->json(new IncidenceResource($incidence),200);
+
+        return response()->json(new IncidenceResource($incidence), 200);
     }
 
     public function update(Request $request)
@@ -82,7 +83,7 @@ class IncidenceController extends Controller
             'space_id' => $request->space_id,
         ]);
 
-        if(!$updated){
+        if (!$updated) {
             DB::rollBack();
             return response()->json(['error' => 'Error creating incidence'], 500);
         }
@@ -90,8 +91,9 @@ class IncidenceController extends Controller
         DB::commit();
 
         return response()->json([
-            'message' => 'Incidence created', 
-            "result" => new IncidenceResource($incidence)], 200);
+            'message' => 'Incidence created',
+            "result" => new IncidenceResource($incidence)
+        ], 200);
     }
 
     public function changeState(Request $request)
@@ -112,9 +114,11 @@ class IncidenceController extends Controller
         }
 
         $incidence->incidence_state_id = $request->stateId;
-        
-        if($request->stateId == self::INCIDENCE_STATE_SOLVED || 
-        $request->stateId == self::INCIDENCE_TYPE_CANCEL){
+
+        if (
+            $request->stateId == self::INCIDENCE_STATE_SOLVED ||
+            $request->stateId == self::INCIDENCE_TYPE_CANCEL
+        ) {
             $incidence->date_end = now();
         }
 
@@ -122,12 +126,14 @@ class IncidenceController extends Controller
 
         $incidenceUpdated = Incidence::find($request->id);
 
-        return response()->json(['message' => 'Incidence state changed', 
-        'IncidenceUpdated' => IncidenceResource::make($incidenceUpdated)], 200);
+        return response()->json([
+            'message' => 'Incidence state changed',
+            'IncidenceUpdated' => IncidenceResource::make($incidenceUpdated)
+        ], 200);
     }
 
 
-    public function changeTech(Request $request) 
+    public function changeTech(Request $request)
     {
 
         $validator = Validator::make($request->all(), [
@@ -155,12 +161,49 @@ class IncidenceController extends Controller
 
         $userIncidence->tech_id = $request->techId;
         $userIncidence->update(["tech_id" => $request->techId]);
-     
+
 
         $incidenceUpdated = Incidence::find($request->id);
 
-        return response()->json(['message' => 'Incidence tech changed', 
-        'IncidenceUpdated' =>  IncidenceResource::make($incidenceUpdated),200]);
+        return response()->json([
+            'message' => 'Incidence tech changed',
+            'IncidenceUpdated' =>  IncidenceResource::make($incidenceUpdated), 200
+        ]);
     }
 
+
+    public function filterIncidences(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'department_id' => 'nullable|integer',
+            'space_id' => 'nullable|integer',
+            'period_start' => 'required|date',
+            'period_end' => 'required|date',
+        ],);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        $departmentId = $request->department_id == -1 ? null : $request->department_id;
+        $spaceId = $request->space_id == -1 ? null : $request->space_id;
+
+        $incidences = Incidence::where('incidence_state_id', self::INCIDENCE_STATE_SOLVED)
+            ->where('department_id', $departmentId)
+            ->where('space_id', $spaceId)
+            ->get();
+
+        $finalResult = $incidences->filter(function ($incidence) use ($request) {
+            $dateStart = Carbon::parse($incidence->date_start)->format('d-m-Y');
+            return $dateStart >= $request->period_start && $dateStart <= $request->period_end;
+        });
+
+        if (!$incidences) {
+            return response()->json(['message' => 'Incidences not found'], 404);
+        }
+
+        return response()->json(IncidenceResource::collection($finalResult), 200);
+    }
 }
+
+
