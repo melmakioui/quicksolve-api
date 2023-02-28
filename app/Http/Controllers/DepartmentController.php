@@ -19,7 +19,7 @@ class DepartmentController extends Controller
 
     public function show($id)
     {
-        $department = Department::where('department_id', $id)
+        $department = DepartmentLanguage::where('department_id', $id)
             ->where('language_id', Language::where('name', 'es')->get()->first()->id)
             ->get()->first();
 
