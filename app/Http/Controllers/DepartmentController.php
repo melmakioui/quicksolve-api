@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\DepartmentLanguage;
 use App\Http\Resources\DepartmentResource;
 use App\Models\Department;
+use App\Models\Incidence;
 use App\Models\Language;
+use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+
 
 class DepartmentController extends Controller
 {
@@ -142,6 +145,19 @@ class DepartmentController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
+
+
+        $incidence = Incidence::all()->where('department_id', $request->id)
+            ->each(function ($incidence) {
+                $incidence->department_id = null;
+                $incidence->save();
+        });
+
+        $users = User::all()->where('department_id', $request->id)
+            ->each(function ($user) {
+                $user->department_id = null;
+                $user->save();
+        });
 
         $department = Department::find($request->id);
         $departmentLangs = DepartmentLanguage::where('department_id', $request->id)->get();
