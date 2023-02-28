@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Space;
+use App\Models\Incidence;
 use App\Models\SpaceLanguage;
 use App\Http\Resources\SpaceResource;
 use App\Models\Language;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+
 
 class SpaceController extends Controller
 {
@@ -134,6 +136,13 @@ class SpaceController extends Controller
 
         $space = Space::find($request->id);
         $spaceLanguages = SpaceLanguage::where('space_id', $request->id)->get();
+
+
+        $incidence = Incidence::all()->where('space_id', $request->id)
+        ->each(function ($incidence) {
+            $incidence->space_id = null;
+            $incidence->save();
+    });
 
         $spaceLanguages->each(function ($spaceLanguage) {
             $spaceLanguage->delete();
