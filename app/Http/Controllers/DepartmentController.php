@@ -19,9 +19,11 @@ class DepartmentController extends Controller
 
     public function show($id)
     {
+        $departmentType = Department::where('id', $id)->pluck('type')->first(); 
         $department = DepartmentLanguage::where('department_id', $id)
             ->where('language_id', Language::where('name', 'es')->get()->first()->id)
             ->get()->first();
+        $department["type"] = $departmentType;
 
         if (!$department) {
             return response()->json(['message' => 'Department not found'], 404);
