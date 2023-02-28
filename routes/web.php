@@ -6,6 +6,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\IncidenceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\LanguageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,4 +65,8 @@ Route::controller(ServiceController::class)->group(function () {
     Route::post('/service/save', 'store');
     Route::put('/service/update', 'update');
     Route::delete('/service/delete', 'destroy');
+});
+
+Route::controller(LanguageController::class)->group(function () {
+    Route::get('/lenguajes', 'index');
 });
