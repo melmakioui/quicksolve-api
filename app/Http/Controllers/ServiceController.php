@@ -58,9 +58,22 @@ class ServiceController extends Controller
         $advantageOne->service_id = $service->id;
         $advantageOne->save();
 
+
+        $advantageEs = new AdvantageLanguage();
+        $advantageEs->advantage_id = $advantageOne->id;
+        $advantageEs->language_id = Language::where('name', 'es')->get()->first()->id;
+        $advantageEs->name = $request->advantageOne;
+        $advantageEs->save();
+
         $advantageTwo = new Advantage();
         $advantageTwo->service_id = $service->id;
         $advantageTwo->save();
+
+        $advantageTwoEs = new AdvantageLanguage();
+        $advantageTwoEs->advantage_id = $advantageTwo->id;
+        $advantageTwoEs->language_id = Language::where('name', 'es')->get()->first()->id;
+        $advantageTwoEs->name = $request->advantageTwo;
+        $advantageTwoEs->save();
 
         foreach($request->advantageOneLangs as $key => $value) {
             if (!Language::where('name', $key)->get()->first()) continue;
