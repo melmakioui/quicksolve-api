@@ -45,6 +45,7 @@ Route::controller(IncidenceController::class)->group(function () {
     Route::post('/incidences/state', 'showIncidencesByState');
     Route::post('/incidence/state/change', 'changeState');
     Route::post('/incidence/change/tech', 'changeTech');
+    Route::post('/incidences/filter', 'filterIncidences');
 });
 
 

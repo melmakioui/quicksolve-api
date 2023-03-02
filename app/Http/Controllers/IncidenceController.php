@@ -163,4 +163,35 @@ class IncidenceController extends Controller
         'IncidenceUpdated' =>  IncidenceResource::make($incidenceUpdated),200]);
     }
 
+    public function filterIncidences (Request $request) {
+
+        $validator = Validator::make($request->all(), [
+            'start' => 'required|date',
+            'end' => 'required|date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
+
+        if(!$request->department_id){
+            $incidences = Incidence::where('incidence_state_id', self::INCIDENCE_STATE_SOLVED)->get();
+        }else{
+            $incidences = Incidence::where('department_id', $request->department_id)
+            ->where('incidence_state_id', self::INCIDENCE_STATE_SOLVED)->get();
+        }
+
+    
+        $result = $incidences->filter(function ($incidence) use ($request) {
+
+            $start = new \DateTime($request->start);
+            $end = new \DateTime($request->end);
+            $incidenceDate = new \DateTime($incidence->date_start);
+
+            return $incidenceDate >= $start && $incidenceDate <= $end;
+        });
+
+        return response()->json(IncidenceResource::collection($result),200);
+    }
+
 }
