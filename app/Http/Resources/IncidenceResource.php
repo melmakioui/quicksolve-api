@@ -16,7 +16,8 @@ class IncidenceResource extends JsonResource
     {
         $user = $this->userIncidences->first()->user ? $this->userIncidences->first()->user : null;
         $tech = $this->userIncidences->last()->userTech ? $this->userIncidences->last()->userTech : null;
-
+        $dateStart = new \DateTime($this->date_start);
+        $dateEnd = new \DateTime($this->date_end);
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -29,6 +30,7 @@ class IncidenceResource extends JsonResource
             'tech' => $tech ? new UserResource($tech) : '',
             'date_start' => $this->date_start ? date('d/m/Y', strtotime($this->date_start)) : '',
             'date_end' => $this->date_end ? date('d/m/Y', strtotime($this->date_end)) : '',
+            'date_period' => $this->incidence_state_id == 3 ? $dateEnd->diff($dateStart)->days : '',        
         ];
 
 

@@ -23,8 +23,10 @@ class Incidence extends Model
         'description',
         'date_start',
         'date_end',
+        'date_period',
     ];
     
+    protected $appends = ['date_period'];
     
     public function space()
     {
