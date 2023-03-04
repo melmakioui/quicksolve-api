@@ -15,6 +15,13 @@ class IncidenceStateLanguage extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'incidence_state_id',
+        'language_id',
+        'status_name',
+        'name',
+    ];
     public function incidenceState()
     {
         return $this->belongsTo(IncidenceState::class, 'incidence_state_id', 'id');

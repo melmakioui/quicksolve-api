@@ -16,7 +16,8 @@ class IncidenceStateResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'status_name' => $this->incidenceStateLangs->where('language_id', 1)->first()->status_name,
+            'name' => $this->status_name,
+            'incidence_state_id' => $this->incidence_state_id,
         ];
     }
 }

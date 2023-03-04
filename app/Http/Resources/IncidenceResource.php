@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\IncidenceStateLanguage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class IncidenceResource extends JsonResource
@@ -18,6 +19,9 @@ class IncidenceResource extends JsonResource
         $tech = $this->userIncidences->last()->userTech ? $this->userIncidences->last()->userTech : null;
         $dateStart = new \DateTime($this->date_start);
         $dateEnd = new \DateTime($this->date_end);
+        $state = IncidenceStateLanguage::where('incidence_state_id', $this->incidence_state_id)
+            ->where('language_id', 1)->first();
+            
         return [
             'id' => $this->id,
             'title' => $this->title,
@@ -25,7 +29,7 @@ class IncidenceResource extends JsonResource
             'email'=> $this->email ? $this->email : '',
             'space' => new SpaceResource($this->space),
             'department' => new DepartmentResource($this->department),
-            'incidenceState' => new IncidenceStateResource($this->incidenceState),
+            'incidenceState' => new IncidenceStateResource($state),
             'user' => $user ? new UserResource($user) : '',
             'tech' => $tech ? new UserResource($tech) : '',
             'date_start' => $this->date_start ? date('d/m/Y', strtotime($this->date_start)) : '',
