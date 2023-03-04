@@ -15,6 +15,13 @@ class WebPageLanguage extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'webpage_id',
+        'language_id',
+        'content',
+    ];
+
     public function webPage()
     {
         return $this->belongsTo(WebPage::class, 'web_page_id', 'id');

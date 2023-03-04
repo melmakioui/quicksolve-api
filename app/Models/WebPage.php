@@ -15,6 +15,11 @@ class WebPage extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'keyy',
+    ];
+
 
     public function webPageLanguages()
     {

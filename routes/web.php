@@ -71,4 +71,5 @@ Route::controller(ServiceController::class)->group(function () {
 Route::controller(LanguageController::class)->group(function () {
     Route::get('/lenguajes', 'index');
     Route::get('/language/fields', 'getFieldsToTranslate');
+    Route::post('/language/save', 'store');
 });

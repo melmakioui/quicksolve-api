@@ -15,6 +15,12 @@ class Language extends Model
 
     protected $primaryKey = 'id';
 
+    protected $fillable = [
+        'id',
+        'name',
+        'language'
+    ];
+
     public function incidenceStateLanguages()
     {
         return $this->hasMany(IncidenceStateLanguage::class, 'language_id', 'id');

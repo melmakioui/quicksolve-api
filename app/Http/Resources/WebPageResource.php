@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Carbon\Language;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Models\WebPageLanguage;
 
 class WebPageResource extends JsonResource
 {
@@ -15,10 +16,16 @@ class WebPageResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $webPageLangs = $this->webPageLanguages()
+            ->where('language_id', 1)->first();    
+
         return [
-            'id' => $this->id,
-            'key' => $this->keyy,
-            'value' => $this->webPageLanguages->where('language_id', 2)->first()
+            'id'=> $this->id,
+            'key'=> $this->keyy,
+            'name'=> $webPageLangs->content ?? '',
+            'language_id'=> $webPageLangs->language_id ?? '',
+            'webpage_id'=> $webPageLangs->webpage_id ?? '',
         ];
     }
 }
