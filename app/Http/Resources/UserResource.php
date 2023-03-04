@@ -19,7 +19,7 @@ class UserResource extends JsonResource
             'username' => $this->username,
             'is_active' => $this->is_active,
             'email' => $this->email,
-            'expiration_date' => $this->service_expiration,
+            'expiration_date' => $this->service_expiration ? date('d/m/Y', strtotime($this->service_expiration)) : '',
             'type' => $this->type,
             'user_data' => $this->userData,
             'department' => DepartmentResource::make($this->department),
