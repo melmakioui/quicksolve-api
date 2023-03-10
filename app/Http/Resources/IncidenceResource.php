@@ -34,7 +34,7 @@ class IncidenceResource extends JsonResource
             'tech' => $tech ? new UserResource($tech) : '',
             'date_start' => $this->date_start ? date('d/m/Y', strtotime($this->date_start)) : '',
             'date_end' => $this->date_end ? date('d/m/Y', strtotime($this->date_end)) : '',
-            'date_period' => $this->incidence_state_id == 3 ? $dateEnd->diff($dateStart)->days : '',        
+            'date_period' => ($this->incidence_state_id == 3 ? $dateEnd->diff($dateStart)->days : '') == 0 ? 1 : $dateEnd->diff($dateStart)->days,       
         ];
 
 

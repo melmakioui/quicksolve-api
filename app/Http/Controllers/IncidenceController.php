@@ -183,13 +183,18 @@ class IncidenceController extends Controller
 
     
         $result = $incidences->filter(function ($incidence) use ($request) {
+            $start = date_parse($request->start);
+            $end = date_parse($request->end);
+            $date = date_parse($incidence->date_end);
 
-            $start = new \DateTime($request->start);
-            $end = new \DateTime($request->end);
-            $incidenceDate = new \DateTime($incidence->date_start);
-
-            return $incidenceDate >= $start && $incidenceDate <= $end;
-        });
+            if($date['year'] >= $start['year'] && $date['year'] <= $end['year']){
+                if($date['month'] >= $start['month'] && $date['month'] <= $end['month']){
+                    if($date['day'] >= $start['day'] && $date['day'] <= $end['day']){
+                        return $incidence;
+                    }
+                }
+            }
+        }); 
 
         return response()->json(IncidenceResource::collection($result),200);
     }
