@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Closure;
-use Http;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
